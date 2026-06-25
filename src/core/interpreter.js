@@ -102,7 +102,7 @@ export function generateReading(baziResult) {
 
   return {
     personality: generatePersonality(dayMaster, strength, pattern, wuxingMissing, yongShen),
-    career: generateCareer(dayMaster, shiShen, pattern, strength, pillars, yongShen),
+    career: generateCareer(dayMaster, shiShen, pattern, strength, pillars, yongShen, gender),
     marriage: generateMarriage(dayMaster, shiShen, gender, pillars, wuxingMissing, yongShen),
     health: generateHealth(wuxingCount, wuxingMissing, dayMaster, yongShen),
     social: generateSocial(dayMaster, shiShen, shenSha, strength, yongShen)
@@ -141,7 +141,7 @@ function generatePersonality(dayMaster, strength, pattern, wuxingMissing, yongSh
 }
 
 // ===== 事业财运解读 =====
-function generateCareer(dayMaster, shiShen, pattern, strength, pillars, yongShen) {
+function generateCareer(dayMaster, shiShen, pattern, strength, pillars, yongShen, gender) {
   let text = '';
 
   // 找出命局中十神分布
@@ -383,7 +383,7 @@ function getHealthAdviceByWuxing(wx) {
 // 日支与日主的关系
 function getZhiGanRelation(dayMaster, dayZhi) {
   // 日支藏干与日主的关系
-  const cangganRelation = ZHI_CANGGAN[dayZhi] || [];
+  const cangganRelation = ZHI_CANGGAN_LOCAL[dayZhi] || [];
   if (!cangganRelation.length) return '';
 
   const mainGan = cangganRelation[0]; // 主气
@@ -409,10 +409,10 @@ function getZhiGanRelation(dayMaster, dayZhi) {
 function getShiShenSimple(dayGan, otherGan) {
   // 简版十神判断
   const wuxingOrder = ['木', '火', '土', '金', '水'];
-  const dayWx = GAN_WUXING[dayGan];
-  const dayYy = GAN_YINYANG[dayGan];
-  const otherWx = GAN_WUXING[otherGan];
-  const otherYy = GAN_YINYANG[otherGan];
+  const dayWx = GAN_WUXING_LOCAL[dayGan];
+  const dayYy = GAN_YINYANG_LOCAL[dayGan];
+  const otherWx = GAN_WUXING_LOCAL[otherGan];
+  const otherYy = GAN_YINYANG_LOCAL[otherGan];
   const sameYy = dayYy === otherYy;
 
   if (dayGan === otherGan) return '日主';

@@ -20,25 +20,27 @@ const state = {
   engine: new BaziEngine(),
 };
 
-// 页面切换
+// 页面切换（用 style.display 而不是 class 切换，确保可靠）
 function switchPage(pageName) {
   state.currentPage = pageName;
 
   // 隐藏所有页面
-  document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
+  document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
 
   // 显示目标页面
   const target = document.getElementById(`page-${pageName}`);
-  if (target) target.classList.remove('hidden');
+  if (target) target.style.display = 'block';
 
   // 更新导航按钮样式
   document.querySelectorAll('.nav-btn').forEach(btn => {
     if (btn.dataset.page === pageName) {
-      btn.classList.remove('bg-ink', 'border-gold/30', 'text-parchment-dark');
-      btn.classList.add('bg-ink-light', 'border-gold', 'text-gold');
+      btn.style.backgroundColor = 'var(--color-ink-light)';
+      btn.style.borderColor = 'var(--color-gold)';
+      btn.style.color = 'var(--color-gold)';
     } else {
-      btn.classList.remove('bg-ink-light', 'border-gold', 'text-gold');
-      btn.classList.add('bg-ink', 'border-gold/30', 'text-parchment-dark');
+      btn.style.backgroundColor = 'var(--color-ink)';
+      btn.style.borderColor = 'rgba(212,168,67,0.3)';
+      btn.style.color = 'var(--color-parchment-dark)';
     }
   });
 
@@ -54,18 +56,16 @@ function onBaziCalculate(params) {
     state.baziResult = state.engine.calculate(year, month, day, hourIndex, gender);
 
     const resultSection = document.getElementById('bazi-result');
-    resultSection.classList.remove('hidden');
-    resultSection.classList.add('fade-in');
+    resultSection.style.display = 'block';
 
     const exportBar = document.getElementById('export-bar');
-    exportBar.classList.remove('hidden');
+    exportBar.style.display = 'flex';
 
     renderChart(state.baziResult);
     renderAnalysis(state.baziResult);
     renderDayun(state.baziResult);
     renderReading(state.baziResult);
 
-    // 保存到历史
     saveToHistory('bazi', state.baziResult);
   } catch (error) {
     console.error('排盘出错:', error);
@@ -78,12 +78,10 @@ function onLiuyaoCalculate(params) {
   try {
     state.liuyaoResult = params.result;
     const resultSection = document.getElementById('liuyao-result');
-    resultSection.classList.remove('hidden');
-    resultSection.classList.add('fade-in');
+    resultSection.style.display = 'block';
 
     renderLiuyaoResult(state.liuyaoResult);
 
-    // 保存到历史
     saveToHistory('liuyao', state.liuyaoResult);
   } catch (error) {
     console.error('六爻计算出错:', error);
@@ -110,18 +108,18 @@ function bindExportButtons() {
 
 // 初始化应用
 function initApp() {
-  // 渲染八字输入表单
-  renderInputForm(onBaziCalculate);
+  // 默认只显示八字页面
+  document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
+  document.getElementById('page-bazi').style.display = 'block';
 
-  // 渲染六爻输入表单
+  renderInputForm(onBaziCalculate);
   renderLiuyaoForm(onLiuyaoCalculate);
 
-  // 导航按钮事件
+  // 导航按钮
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => switchPage(btn.dataset.page));
   });
 
-  // 导出按钮
   bindExportButtons();
 }
 

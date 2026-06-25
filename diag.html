@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>排盘诊断</title>
+<style>body{background:#1A1A2E;color:#F5E6D0;font-family:serif;padding:20px}h2{color:#D4A843}.ok{color:#4CAF50}.err{color:#E53935}pre{background:#16213E;padding:10px;border-radius:8px;overflow:auto}</style>
+</head><body>
+<h2>排盘诊断测试</h2>
+<div id="result"></div>
+<div id="detail"></div>
+<script type="module">
+import { BaziEngine } from '/src/core/bazi-engine.js';
+const engine = new BaziEngine();
+const div = document.getElementById('result');
+const detail = document.getElementById('detail');
+
+// 测试不同输入
+const tests = [
+  {y:1990,m:1,d:15,h:6,g:'男'},
+  {y:2000,m:6,d:20,h:4,g:'女'},
+  {y:1985,m:12,d:1,h:0,g:'男'},
+];
+
+for (const t of tests) {
+  try {
+    const r = engine.calculate(t.y, t.m, t.d, t.h, t.g);
+    div.innerHTML += `<p class="ok">✅ ${t.y}/${t.m}/${t.d} h${t.h} ${t.g} - OK</p>`;
+    // 检查关键数据
+    const dm = r.basic.dayMaster;
+    const hs = r.hiddenStems;
+    const ss = r.shiShen;
+    detail.innerHTML += `<pre>日主: ${JSON.stringify(dm)}\nhiddenStems.year[0]: ${JSON.stringify(hs.year[0])}\nshiShen.year: ${JSON.stringify(ss.year)}</pre>`;
+  } catch(e) {
+    div.innerHTML += `<p class="err">❌ ${t.y}/${t.m}/${t.d} h${t.h} ${t.g} - ${e.message}</p>`;
+    detail.innerHTML += `<pre>${e.stack}</pre>`;
+  }
+}
+</script>
+</body></html>

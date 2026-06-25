@@ -68,7 +68,7 @@ export function renderLiuyaoForm(onCalculate) {
         </div>
 
         <!-- 时间起卦区（隐藏） -->
-        <div id="time-area" class="hidden">
+        <div id="time-area" style="display:none">
           <p class="text-sm text-parchment-dark/70 text-center mb-4">
             根据当前时间自动起卦，点击下方按钮即可
           </p>
@@ -80,8 +80,8 @@ export function renderLiuyaoForm(onCalculate) {
         </div>
 
         <!-- 占卜按钮 -->
-        <button id="liuyao-calculate-btn" class="w-full bg-vermilion hover:bg-vermilion-dark text-parchment font-brush text-xl py-3 rounded-lg border-2 border-gold/40 transition-all hover:border-gold cursor-pointer tracking-widest disabled:opacity-40 disabled:cursor-not-allowed" disabled>
-          起卦占卜
+        <button id="liuyao-calculate-btn" class="w-full bg-[var(--color-vermilion)] hover:bg-[var(--color-vermilion-dark)] text-[var(--color-parchment)] font-[var(--font-brush)] text-xl py-3 rounded-lg border-2 border-[var(--color-gold)]/40 transition-all hover:border-[var(--color-gold)] cursor-pointer tracking-widest" style="opacity:0.4; pointer-events:none;">
+          起卦占卜（请先掷完铜钱或点"随机掷卦"）
         </button>
       </div>
     </div>
@@ -108,11 +108,11 @@ function bindEvents(onCalculate) {
       const coinsArea = document.getElementById('coins-area');
       const timeArea = document.getElementById('time-area');
       if (method === 'coins') {
-        coinsArea.classList.remove('hidden');
-        timeArea.classList.add('hidden');
+        coinsArea.style.display = 'block';
+        timeArea.style.display = 'none';
       } else {
-        coinsArea.classList.add('hidden');
-        timeArea.classList.remove('hidden');
+        coinsArea.style.display = 'none';
+        timeArea.style.display = 'block';
       }
     });
   });
@@ -246,9 +246,19 @@ function bindEvents(onCalculate) {
     const btn = document.getElementById('liuyao-calculate-btn');
     if (selectedMethod === 'coins') {
       const allFilled = coinResults.every(group => group.every(v => v !== null));
-      btn.disabled = !allFilled;
+      if (allFilled) {
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+        btn.textContent = '起卦占卜';
+      } else {
+        btn.style.opacity = '0.4';
+        btn.style.pointerEvents = 'none';
+        btn.textContent = '起卦占卜（请先掷完铜钱或点"随机掷卦"）';
+      }
     } else {
-      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      btn.textContent = '起卦占卜';
     }
   }
 }

@@ -213,11 +213,14 @@ export class BaziEngine {
     const hour = this.shichenToHour(hourIndex);
 
     // 创建 Solar 对象
-    const solar = Solar.fromYmdHour(year, month, day, hour);
-    const lunar = solar.getLunar();
-
-    // 获取八字对象（lunar-javascript 提供的）
-    const bazi = lunar.getEightChar();
+    let solar, lunar, bazi;
+    try {
+      solar = Solar.fromYmdHms(year, month, day, hour, 0, 0);
+      lunar = solar.getLunar();
+      bazi = lunar.getEightChar();
+    } catch(e) {
+      throw new Error('日期转换失败: ' + e.message + ' (输入: ' + year + '年' + month + '月' + day + '日 ' + hour + '时)');
+    }
 
     // 四柱数据
     const yearGan = bazi.getYearGan();
@@ -229,6 +232,12 @@ export class BaziEngine {
     const hourGan = bazi.getTimeGan();
     const hourZhi = bazi.getTimeZhi();
 
+    // 纳音（用lunar-javascript原生API）
+    const yearNayin = bazi.getYearNaYin();
+    const monthNayin = bazi.getMonthNaYin();
+    const dayNayin = bazi.getDayNaYin();
+    const hourNayin = bazi.getTimeNaYin();
+
     // 日主信息
     const dayMaster = {
       gan: dayGan,
@@ -238,10 +247,10 @@ export class BaziEngine {
 
     // 四柱
     const pillars = {
-      year: this.buildPillar(yearGan, yearZhi, dayMaster),
-      month: this.buildPillar(monthGan, monthZhi, dayMaster),
-      day: this.buildPillar(dayGan, dayZhi, dayMaster),
-      hour: this.buildPillar(hourGan, hourZhi, dayMaster)
+      year: this.buildPillar(yearGan, yearZhi, dayMaster, yearNayin),
+      month: this.buildPillar(monthGan, monthZhi, dayMaster, monthNayin),
+      day: this.buildPillar(dayGan, dayZhi, dayMaster, dayNayin),
+      hour: this.buildPillar(hourGan, hourZhi, dayMaster, hourNayin)
     };
 
     // 五行计数（含藏干）
@@ -312,7 +321,7 @@ export class BaziEngine {
   }
 
   // 构建单柱数据
-  buildPillar(gan, zhi, dayMaster) {
+  buildPillar(gan, zhi, dayMaster, nayin) {
     return {
       gan,
       zhi,
@@ -321,7 +330,7 @@ export class BaziEngine {
       ganYinyang: GAN_YINYANG[gan],
       canggan: ZHI_CANGGAN[zhi],
       shiShen: this.getShiShenForGan(dayMaster.gan, gan),
-      nayin: NAYIN_TABLE[gan + zhi] || ''
+      nayin: nayin || ''
     };
   }
 
@@ -627,13 +636,21 @@ export class BaziEngine {
   // 大运计算
   calculateDaYun(bazi, gender) {
     const daYunList = [];
-    // lunar-javascript 提供了大运计算
-    const yunList = bazi.getDaYun(gender === '男' ? 1 : -1, 8);
+    // 正确调用方式：先getYun，再getDaYun
+    const yun = bazi.getYun(gender === '男' ? 1 : 0, 2);
+    const yunList = yun.getDaYun(8);
 
-    for (const yun of yunList) {
-      const startAge = yun.getStartAge();
-      const gan = yun.getStartGanZhi().getGan();
-      const zhi = yun.getStartGanZhi().getZhi();
+    for (const dy of yunList) {
+      const startAge = dy.getStartAge();
+      const ganZhi = dy.getGanZhi();
+
+      // 第0个大运是"小运"，没有干支
+      if (dy.getIndex() < 1) {
+        continue;
+      }
+
+      const gan = ganZhi.charAt(0);
+      const zhi = ganZhi.charAt(1);
 
       daYunList.push({
         startAge,

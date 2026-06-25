@@ -20,7 +20,7 @@ const WX_CHART_COLORS = {
  */
 export function renderAnalysis(baziResult) {
   const container = document.getElementById('analysis-area');
-  const { wuxingCount, wuxingMissing, strength, pattern, yongShen, dayMaster } = baziResult;
+  try {
 
   // 五行总数
   const totalWx = Object.values(wuxingCount).reduce((a, b) => a + b, 0);
@@ -116,4 +116,7 @@ export function renderAnalysis(baziResult) {
       <div class="divider"></div>
     </div>
   `;
+  } catch(e) {
+    container.innerHTML = `<p style="color:var(--color-vermilion)">五行分析渲染出错: ${e.message}</p>`;
+  }
 }

@@ -89,9 +89,9 @@ function bindHistoryEvents(state) {
         switchToPage('bazi');
 
         const resultSection = document.getElementById('bazi-result');
-        resultSection.classList.remove('hidden');
+        resultSection.style.display = 'block';
         const exportBar = document.getElementById('export-bar');
-        exportBar.classList.remove('hidden');
+        exportBar.style.display = 'flex';
 
         import('./chart-render.js').then(m => m.renderChart(item.data));
         import('./analysis-render.js').then(m => m.renderAnalysis(item.data));
@@ -103,7 +103,7 @@ function bindHistoryEvents(state) {
         switchToPage('liuyao');
 
         const resultSection = document.getElementById('liuyao-result');
-        resultSection.classList.remove('hidden');
+        resultSection.style.display = 'block';
 
         import('./liuyao-result.js').then(m => m.renderLiuyaoResult(item.data));
       }

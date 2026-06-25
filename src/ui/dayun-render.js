@@ -18,6 +18,7 @@ const PILLAR_CN = {
  */
 export function renderDayun(baziResult) {
   const container = document.getElementById('dayun-area');
+  try {
   const { daYun, liuNian } = baziResult;
 
   // 当前年份
@@ -78,10 +79,10 @@ export function renderDayun(baziResult) {
       <div class="divider"></div>
     </div>
   `;
+  } catch(e) {
+    container.innerHTML = `<p style="color:var(--color-vermilion)">大运渲染出错: ${e.message}</p>`;
+  }
 }
-
-// 获取当前年龄（粗略估算）
-// 注意：这里用出生年份估算，不精确到月日
 function getCurrentAge(baziResult) {
   const birthYear = parseInt(baziResult.basic.solarDate.match(/(\d+)年/)[1]);
   const nowYear = new Date().getFullYear();

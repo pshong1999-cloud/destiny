@@ -247,8 +247,8 @@ export class LiuyaoEngine {
 
     // 六亲
     const liuqinList = naJiaData.map(nj => {
-      const爻Wx = ZHI_WUXING[nj.zhi];
-      return this.getLiuqin(gongWuxing, 爻Wx);
+      const yaoWx = ZHI_WUXING[nj.zhi];
+      return this.getLiuqin(gongWuxing, yaoWx);
     });
 
     // 世应位置
@@ -362,24 +362,46 @@ export class LiuyaoEngine {
 
   // 纳甲配爻
   getNaJiaForGua(innerGua, outerGua) {
-    const innerNa = NA_JIA[innerGua];
-    const outerNa = NA_JIA[outerGua];
+    try {
+      const innerNa = NA_JIA[innerGua];
+      const outerNa = NA_JIA[outerGua];
 
-    // 内卦3爻 + 外卦3爻 = 6爻
-    // 注意：外卦纳甲可能需要换天干
-    const innerGan = innerNa.gan;
-    const outerGan = this.getOuterGan(innerGua, outerGua);
+      if (!innerNa || !outerNa) {
+        // fallback: 用乾卦的纳甲
+        const fallback = NA_JIA['乾'];
+        const result = [];
+        for (let i = 0; i < 3; i++) {
+          result.push({ gan: fallback.gan, zhi: fallback.zhi[i] });
+        }
+        for (let i = 0; i < 3; i++) {
+          result.push({ gan: fallback.gan, zhi: fallback.zhi[i + 3] });
+        }
+        return result;
+      }
 
-    const result = [];
-    // 初爻到三爻（内卦）
-    for (let i = 0; i < 3; i++) {
-      result.push({ gan: innerGan, zhi: innerNa.zhi[i] });
+      const innerGan = innerNa.gan;
+      const outerGan = this.getOuterGan(innerGua, outerGua);
+
+      const result = [];
+      // 初爻到三爻（内卦）
+      for (let i = 0; i < 3; i++) {
+        result.push({ gan: innerGan, zhi: innerNa.zhi[i] });
+      }
+      // 四爻到六爻（外卦）
+      for (let i = 0; i < 3; i++) {
+        result.push({ gan: outerGan, zhi: outerNa.zhi[i] });
+      }
+      return result;
+    } catch(e) {
+      console.warn('纳甲计算异常:', e.message);
+      // fallback
+      const fallback = NA_JIA['乾'];
+      const result = [];
+      for (let i = 0; i < 6; i++) {
+        result.push({ gan: fallback.gan, zhi: fallback.zhi[i] });
+      }
+      return result;
     }
-    // 四爻到六爻（外卦）
-    for (let i = 0; i < 3; i++) {
-      result.push({ gan: outerGan, zhi: outerNa.zhi[i] });
-    }
-    return result;
   }
 
   // 外卦天干

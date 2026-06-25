@@ -13,6 +13,7 @@ const WX_COLOR_CLASS = {
  */
 export function renderReading(baziResult) {
   const container = document.getElementById('reading-area');
+  try {
   const reading = generateReading(baziResult);
 
   const sections = [
@@ -48,4 +49,7 @@ export function renderReading(baziResult) {
       <div class="divider"></div>
     </div>
   `;
+  } catch(e) {
+    container.innerHTML = `<p style="color:var(--color-vermilion)">解读渲染出错: ${e.message}</p>`;
+  }
 }
